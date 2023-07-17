@@ -1,10 +1,12 @@
+import { injectable } from 'inversify'
 import Rcon from 'ts-rcon'
-
 import { delay } from '../util'
+
 
 type ResponseCallback = (response: string) => void
 
-export class PlayerListService {
+@injectable()
+export class RconService {
   private rcon: Rcon | null = null
 
   private connectionRetries = 0
@@ -21,16 +23,16 @@ export class PlayerListService {
 
     this.rcon
       .on('auth', () => this.onAuth())
-      .on('error', () => this.onError())
+      .on('error', (error) => this.onError(error))
       .on('response', (response) => this.onResponse(response))
       .on('end', () => this.onEnd())
 
     this.rcon.connect()
   }
 
-  request() {
+  request(command: string) {
     if (this.ready) {
-      this.rcon?.send('players')
+      this.rcon?.send(command)
     }
   }
 
@@ -40,10 +42,11 @@ export class PlayerListService {
 
   onAuth() {
     this.ready = true
-    this.rcon?.send('players')
   }
 
-  onError() {
+  onError(error: string) {
+    console.error(error)
+
     this.connectionRetries += 1
 
     if (this.connectionRetries <= 3) {
@@ -52,6 +55,7 @@ export class PlayerListService {
   }
 
   onResponse(response: string) {
+    console.log(response.length)
     if (this.callback) {
       this.callback(response)
     }

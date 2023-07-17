@@ -1,9 +1,12 @@
+import 'reflect-metadata'
 import { Client, Events, GatewayIntentBits } from 'discord.js'
 import Rcon from 'ts-rcon'
 import dotenv from 'dotenv'
 
+import { container } from './container'
 import { delay } from './util'
-import { PlayerListService } from './services/PlayerList'
+import { PlayerListService } from './services/PlayerListService'
+import { RconService} from './services/RconService'
 
 dotenv.config()
 
@@ -12,16 +15,17 @@ const client = new Client({
 })
 
 async function main() {
-  const playerListService = new PlayerListService()
-  playerListService.setResponseCallback((response) => {
-    console.log(response)
-  })
-
+  const rconService = new RconService()
+  const playerListService = container.get(PlayerListService)
+  //const playerListService = new PlayerListService(rconService)
+  
   while (true) {
-    playerListService.request()
-    await delay(1000 * 60)
+    playerListService.updatePlayers()
+    await delay(1000)
   }
 }
+
+container.bind<Client>(Client).toDynamicValue(() => client)
 
 client.once(Events.ClientReady, main)
 
