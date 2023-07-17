@@ -55,7 +55,6 @@ export class RconService {
   }
 
   onResponse(response: string) {
-    console.log(response.length)
     if (this.callback) {
       this.callback(response)
     }

@@ -17,11 +17,10 @@ const client = new Client({
 async function main() {
   const rconService = new RconService()
   const playerListService = container.get(PlayerListService)
-  //const playerListService = new PlayerListService(rconService)
   
   while (true) {
     playerListService.updatePlayers()
-    await delay(1000)
+    await delay(1000 * 60)
   }
 }
 
