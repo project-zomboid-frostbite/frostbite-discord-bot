@@ -1,12 +1,10 @@
 import 'reflect-metadata'
 import { Client, Events, GatewayIntentBits } from 'discord.js'
-import Rcon from 'ts-rcon'
 import dotenv from 'dotenv'
 
 import { container } from './container'
 import { delay } from './util'
 import { PlayerListService } from './services/PlayerListService'
-import { RconService} from './services/RconService'
 
 dotenv.config()
 
@@ -15,12 +13,11 @@ const client = new Client({
 })
 
 async function main() {
-  const rconService = new RconService()
   const playerListService = container.get(PlayerListService)
-  
+
   while (true) {
     playerListService.updatePlayers()
-    await delay(1000 * 60)
+    await delay(1000 * Number(process.env.MAIN_LOOP_INTERVAL ?? 60))
   }
 }
 

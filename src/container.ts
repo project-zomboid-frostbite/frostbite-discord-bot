@@ -1,5 +1,4 @@
 import { Container } from 'inversify'
-import { Client } from 'discord.js'
 
 import { PlayerListService } from './services/PlayerListService'
 import { RconService } from './services/RconService'
