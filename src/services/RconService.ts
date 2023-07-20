@@ -1,6 +1,5 @@
 import { injectable } from 'inversify'
 import Rcon from 'ts-rcon'
-import { delay } from '../util'
 
 type ResponseCallback = (response: string) => void
 
@@ -13,6 +12,8 @@ export class RconService {
   private ready = false
 
   private callback: ResponseCallback | null = null
+
+  private command: string | null = null
 
   constructor() {
     this.rcon = new Rcon(
@@ -30,45 +31,32 @@ export class RconService {
       .on('error', (error) => this.onError(error))
       .on('response', (response) => this.onResponse(response))
       .on('end', () => this.onEnd())
-
-    this.rcon.connect()
   }
 
-  isReady() {
-    return this.ready
-  }
-
-  request(command: string) {
-    if (this.ready) {
-      this.rcon?.send(command)
-    }
-  }
-
-  setResponseCallback(callback: ResponseCallback) {
+  request(command: string, callback: ResponseCallback) {
     this.callback = callback
+    this.command = command
+
+    this.rcon?.connect()
   }
 
   onAuth() {
-    this.ready = true
-  }
-
-  onError(error: string) {
-    console.error(error)
-
-    this.connectionRetries += 1
-
-    if (this.connectionRetries <= 3) {
-      delay(1000).then(() => this.rcon?.connect())
+    if (this.command) {
+      this.rcon?.send(this.command)
     }
   }
+
+  onError = console.error
 
   onResponse(response: string) {
-    if (this.callback && response.length > 0) {
+    if (this.callback) {
       this.callback(response)
     }
+    this.rcon?.disconnect()
   }
 
   onEnd() {
-    // goodbye!
+    this.callback = null
+    this.command = null
   }
 }
