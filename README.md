@@ -12,3 +12,5 @@ This bot can be configured using the following environmental variables:
 | `RCON_PORT` | The port of the Project Zomboid RCON server | 
 | `RCON_PASSWORD` | The password of the Project Zomboid RCON server |
 | `DISCORD_PLAYER_COUNT_CHANNEL_ID` | The Discord channel ID where the player count should be displayed |
+
+[cc-by-nc-sa-shield]: https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg
