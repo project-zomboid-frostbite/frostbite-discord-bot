@@ -5,7 +5,7 @@ import { RconService } from './services/RconService'
 import { RestartWarningService } from './services/RestartWarningService'
 
 const container = new Container()
-container.bind<PlayerListService>(PlayerListService).toSelf()
+container.bind<PlayerListService>(PlayerListService).toSelf().inSingletonScope()
 container.bind<RestartWarningService>(RestartWarningService).toSelf()
 container.bind<RconService>(RconService).toSelf()
 

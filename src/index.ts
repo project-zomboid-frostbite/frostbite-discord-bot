@@ -3,7 +3,7 @@ import { Client, Events, GatewayIntentBits } from 'discord.js'
 import dotenv from 'dotenv'
 
 import { container } from './container'
-import { playerListServiceJob, restarWarningServiceJob } from './cronjobs'
+import { restartWarningServiceJob, playerListServiceJob } from './cronjobs'
 
 dotenv.config()
 
@@ -12,7 +12,7 @@ const client = new Client({
 })
 
 async function main() {
-  restarWarningServiceJob.start()
+  restartWarningServiceJob.start()
   playerListServiceJob.start()
 }
 
