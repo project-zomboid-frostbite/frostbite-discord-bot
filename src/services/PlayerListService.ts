@@ -21,11 +21,12 @@ export class PlayerListService {
     private client: Client,
     private rcon: RconService,
   ) {
+    this.rcon.setResponseCallback((response) => this.onResponse(response))
     this.fetchChannel().then(() => this.clearChannel())
   }
 
   updatePlayers() {
-    this.rcon.request('players', (response) => this.onResponse(response))
+    this.rcon.request('players')
   }
 
   get playerCount() {

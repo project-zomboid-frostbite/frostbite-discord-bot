@@ -1,5 +1,6 @@
 import { injectable } from 'inversify'
 import Rcon from 'ts-rcon'
+import { delay } from '../util'
 
 type ResponseCallback = (response: string) => void
 
@@ -8,8 +9,6 @@ export class RconService {
   private rcon: Rcon | null = null
 
   private connectionRetries = 0
-
-  private ready = false
 
   private callback: ResponseCallback | null = null
 
@@ -33,11 +32,13 @@ export class RconService {
       .on('end', () => this.onEnd())
   }
 
-  request(command: string, callback: ResponseCallback) {
-    this.callback = callback
+  request(command: string) {
     this.command = command
-
     this.rcon?.connect()
+  }
+
+  setResponseCallback(callback: ResponseCallback) {
+    this.callback = callback
   }
 
   onAuth() {
@@ -48,15 +49,16 @@ export class RconService {
 
   onError = console.error
 
-  onResponse(response: string) {
-    if (this.callback) {
+  async onResponse(response: string) {
+    if (this.callback && response.length > 0) {
       this.callback(response)
     }
+
+    await delay(300)
     this.rcon?.disconnect()
   }
 
   onEnd() {
-    this.callback = null
-    this.command = null
+    // goodbye!
   }
 }
