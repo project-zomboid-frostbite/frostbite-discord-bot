@@ -1,4 +1,10 @@
-import { Client, EmbedBuilder, TextChannel, Message, ActivityType } from 'discord.js'
+import {
+  Client,
+  EmbedBuilder,
+  TextChannel,
+  Message,
+  ActivityType,
+} from 'discord.js'
 import { injectable } from 'inversify'
 
 import { RconService } from './RconService'
