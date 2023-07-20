@@ -14,3 +14,4 @@ This bot can be configured using the following environmental variables:
 | `DISCORD_PLAYER_COUNT_CHANNEL_ID` | The Discord channel ID where the player count should be displayed |
 
 [cc-by-nc-sa-shield]: https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg
+[cc-by-nc-sa]: http://creativecommons.org/licenses/by-nc-sa/4.0/
