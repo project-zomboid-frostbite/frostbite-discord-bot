@@ -23,7 +23,7 @@ export class PlayersService {
     });
   }
 
-  @Interval(1000)
+  @Interval(60000)
   updatePlayerList() {
     if (this.discord.isReady()) {
       this.logger.debug('Updating player list');
