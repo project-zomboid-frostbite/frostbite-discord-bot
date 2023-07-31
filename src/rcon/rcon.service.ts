@@ -1,18 +1,21 @@
-import { injectable } from 'inversify'
-import Rcon from 'ts-rcon'
-import { delay } from '../util'
+import { Injectable } from '@nestjs/common';
+import Rcon from 'ts-rcon';
 
-type ResponseCallback = (response: string) => void
+type ResponseCallback = (response: string) => void;
 
-@injectable()
+@Injectable()
 export class RconService {
-  private rcon: Rcon | null = null
+  private rcon: Rcon | null = null;
 
-  private connectionRetries = 0
+  private connectionRetries = 0;
 
-  private callback: ResponseCallback | null = null
+  private callback: ResponseCallback | null = null;
 
-  private command: string | null = null
+  private command: string | null = null;
+
+  private keepAlive = true;
+
+  private authenticated = false;
 
   constructor() {
     this.rcon = new Rcon(
@@ -23,39 +26,37 @@ export class RconService {
         challenge: false,
         tcp: false,
       },
-    )
+    );
 
     this.rcon
       .on('auth', () => this.onAuth())
       .on('error', (error) => this.onError(error))
       .on('response', (response) => this.onResponse(response))
-      .on('end', () => this.onEnd())
+      .on('end', () => this.onEnd());
+
+    this.rcon.connect();
   }
 
   request(command: string) {
-    this.command = command
-    this.rcon?.connect()
+    if (this.authenticated) {
+      this.rcon?.send(command);
+    }
   }
 
   setResponseCallback(callback: ResponseCallback) {
-    this.callback = callback
+    this.callback = callback;
   }
 
   onAuth() {
-    if (this.command) {
-      this.rcon?.send(this.command)
-    }
+    this.authenticated = true;
   }
 
-  onError = console.error
+  onError = console.error;
 
   async onResponse(response: string) {
     if (this.callback && response.length > 0) {
-      this.callback(response)
+      this.callback(response);
     }
-
-    await delay(300)
-    this.rcon?.disconnect()
   }
 
   onEnd() {
