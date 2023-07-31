@@ -15,7 +15,7 @@ export class RestartWarningService {
   @Cron('45,50,55,59 5,11,17,23 * * *', {
     timeZone: 'Europe/Amsterdam',
   })
-  public invoke() {
+  broadcastRestartWarning() {
     const restarts = this.restarts
       .map((restart) =>
         DateTime.fromISO(restart)
@@ -26,12 +26,10 @@ export class RestartWarningService {
 
     const nearest = Duration.fromMillis(Math.min(...restarts)).toFormat('mm');
 
-    this.logger.log('Invoking restart warning', nearest);
+    this.logger.log(`Broadcasting restart warning: ${nearest} minutes`);
 
     this.rcon.request(
-      `servermsg "the server is restarting in ${Duration.fromMillis(
-        nearest,
-      ).toFormat('mm')} minutes"`,
+      `servermsg "the server is restarting in ${nearest} minutes"`,
     );
   }
 }
