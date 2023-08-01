@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
 import { Interval } from '@nestjs/schedule';
 import { EmbedBuilder, TextChannel, Message, ActivityType } from 'discord.js';
 
@@ -9,15 +10,13 @@ import { DiscordService } from '../discord/discord.service';
 export class PlayersService {
   private readonly logger = new Logger(PlayersService.name);
 
-  private message: Message<true> | null = null;
+  private message: Message<true>;
 
-  private channel: TextChannel | null = null;
+  private channel: TextChannel;
 
   private players: string[] = [];
 
   constructor(private rcon: RconService, private discord: DiscordService) {
-    this.rcon.setResponseCallback((response) => this.onResponse(response));
-
     this.discord.getClient().on('ready', () => {
       this.fetchChannel().then(() => this.clearChannel());
     });
@@ -26,19 +25,14 @@ export class PlayersService {
   @Interval(60000)
   updatePlayerList() {
     if (this.discord.isReady()) {
-      this.logger.debug('Updating player list');
       this.rcon.request('players');
     }
-  }
-
-  get playerCount() {
-    return this.players.length;
   }
 
   async fetchChannel() {
     const channel = await this.discord
       .getClient()
-      .channels.fetch(process.env.DISCORD_PLAYER_COUNT_CHANNEL_ID!);
+      .channels.fetch(process.env.DISCORD_PLAYER_COUNT_CHANNEL_ID);
 
     if (channel instanceof TextChannel) {
       this.channel = channel;
@@ -51,19 +45,22 @@ export class PlayersService {
     }
   }
 
+  @OnEvent('rcon.players')
   async onResponse(response: string) {
     this.players = response
       .split('\n')
       .splice(1)
       .map((player) => player.substring(1));
 
+    this.logger.debug(`Updating player list (${this.players.length})`);
+
     this.discord.getClient().user?.setPresence({
       status: 'online',
       activities: [
         {
           type: ActivityType.Watching,
-          name: `${this.playerCount} survivor${
-            this.playerCount === 1 ? '' : 's'
+          name: `${this.players.length} survivor${
+            this.players.length === 1 ? '' : 's'
           }`,
         },
       ],
@@ -79,7 +76,7 @@ export class PlayersService {
       .setTimestamp()
       .addFields({
         name: 'Total players connected',
-        value: `${this.playerCount}/32`,
+        value: `${this.players.length}/32`,
       })
       .setFooter({ text: 'Bot made with ♥ by the Frostbite team' });
 
