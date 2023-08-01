@@ -12,28 +12,28 @@ export class RestartWarningService {
   @Cron('59 5,11,17,23 * * *', {
     timeZone: 'Europe/Amsterdam',
   })
-  private broadCast1minute() {
+  private broadcast1minute() {
     this.broadcastRestartWarning(1);
   }
 
   @Cron('55 5,11,17,23 * * *', {
     timeZone: 'Europe/Amsterdam',
   })
-  private broadCast5minutes() {
+  private broadcast5minutes() {
     this.broadcastRestartWarning(5);
   }
 
   @Cron('50 5,11,17,23 * * *', {
     timeZone: 'Europe/Amsterdam',
   })
-  private broadCast10minutes() {
+  private broadcast10minutes() {
     this.broadcastRestartWarning(10);
   }
 
   @Cron('45 5,11,17,23 * * *', {
     timeZone: 'Europe/Amsterdam',
   })
-  private broadCast15minutes() {
+  private broadcast15minutes() {
     this.broadcastRestartWarning(15);
   }
 
