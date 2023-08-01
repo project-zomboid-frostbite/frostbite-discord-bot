@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
+import { EventEmitter2 } from '@nestjs/event-emitter'
 import { Client, Events, GatewayIntentBits } from 'discord.js'
 
 @Injectable()
@@ -11,9 +12,10 @@ export class DiscordService {
 
   private ready = false
 
-  constructor() {
+  constructor(private eventEmitter: EventEmitter2) {
     this.client.once(Events.ClientReady, () => {
       this.logger.log('Connected to discord bot')
+      this.eventEmitter.emit('discord.ready')
       this.ready = true
     })
   }

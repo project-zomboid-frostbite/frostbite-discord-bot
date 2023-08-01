@@ -23,7 +23,7 @@ export class PlayersService {
   }
 
   @Interval(60000)
-  updatePlayerList() {
+  private updatePlayerList() {
     if (this.discord.isReady()) {
       this.rcon.request('players')
     }

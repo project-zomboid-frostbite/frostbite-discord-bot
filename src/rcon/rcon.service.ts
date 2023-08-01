@@ -8,9 +8,9 @@ export class RconService {
 
   private readonly logger = new Logger(RconService.name)
 
-  private commands: string[] = []
+  private reconnectTries = 0
 
-  private authenticated = false
+  private commands: string[] = []
 
   constructor(private eventEmitter: EventEmitter2) {
     this.rcon = new Rcon(
@@ -41,11 +41,16 @@ export class RconService {
 
   onAuth() {
     this.logger.log('Connected to RCON')
-    this.authenticated = true
+    this.reconnectTries = 0
   }
 
   onError(error: Error) {
     this.logger.error(error)
+
+    if (this.reconnectTries > 0) {
+      this.logger.debug(`Reconnecting after ${this.reconnectTimeout}ms`)
+      this.reconnect()
+    }
   }
 
   onResponse(response) {
@@ -58,9 +63,18 @@ export class RconService {
 
   onEnd() {
     this.logger.error('Connection to RCON closed')
+    this.reconnect()
+  }
 
+  private reconnect() {
     setTimeout(() => {
+      this.commands = []
+      this.reconnectTries++
       this.connect()
-    }, 5000)
+    }, this.reconnectTimeout)
+  }
+
+  get reconnectTimeout() {
+    return Math.pow(2, this.reconnectTries) * 1000 + Math.random()
   }
 }
