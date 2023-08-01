@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
-import { Duration, DateTime } from 'luxon';
 
 import { RconService } from '../rcon/rcon.service';
 
@@ -8,28 +7,41 @@ import { RconService } from '../rcon/rcon.service';
 export class RestartWarningService {
   private readonly logger = new Logger(RestartWarningService.name);
 
-  private readonly restarts = ['06:00', '12:00', '18:00', '24:00'];
-
   constructor(private rcon: RconService) {}
 
-  @Cron('45,50,55,59 5,11,17,23 * * *', {
+  @Cron('59 5,11,17,23 * * *', {
     timeZone: 'Europe/Amsterdam',
   })
-  broadcastRestartWarning() {
-    const restarts = this.restarts
-      .map((restart) =>
-        DateTime.fromISO(restart)
-          .diff(DateTime.now().setZone('Europe/Amsterdam'))
-          .toMillis(),
-      )
-      .filter((ms) => ms > 0);
+  private broadCast1minute() {
+    this.broadcastRestartWarning(1);
+  }
 
-    const nearest = Duration.fromMillis(Math.min(...restarts)).toFormat('mm');
+  @Cron('55 5,11,17,23 * * *', {
+    timeZone: 'Europe/Amsterdam',
+  })
+  private broadCast5minutes() {
+    this.broadcastRestartWarning(5);
+  }
 
-    this.logger.log(`Broadcasting restart warning: ${nearest} minutes`);
+  @Cron('50 5,11,17,23 * * *', {
+    timeZone: 'Europe/Amsterdam',
+  })
+  private broadCast10minutes() {
+    this.broadcastRestartWarning(10);
+  }
+
+  @Cron('45 5,11,17,23 * * *', {
+    timeZone: 'Europe/Amsterdam',
+  })
+  private broadCast15minutes() {
+    this.broadcastRestartWarning(15);
+  }
+
+  private broadcastRestartWarning(minutes: number) {
+    this.logger.log(`Broadcasting restart warning: ${minutes} minutes`);
 
     this.rcon.request(
-      `servermsg "the server is restarting in ${nearest} minutes"`,
+      `servermsg "the server is restarting in ${minutes} minutes, log off now!"`,
     );
   }
 }
