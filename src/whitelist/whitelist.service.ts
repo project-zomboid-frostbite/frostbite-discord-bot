@@ -47,12 +47,8 @@ export class WhitelistService {
     this.message.reply({ embeds: [this.createEmbed(this.user)] })
   }
 
-  async isAuthorized(message: Message) {
-    const role = await message.guild.roles.fetch(
-      process.env.DISCORD_MODERATOR_ROLE_ID,
-    )
-
-    return message.member.roles.cache.has(role.id)
+  isAuthorized(message: Message) {
+    return message.member.roles.cache.has(process.env.DISCORD_MODERATOR_ROLE_ID)
   }
 
   private generatePassword() {
