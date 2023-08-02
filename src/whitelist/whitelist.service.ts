@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { OnEvent } from '@nestjs/event-emitter'
-import { Message, codeBlock, EmbedBuilder } from 'discord.js'
+import { Message, User, codeBlock, EmbedBuilder } from 'discord.js'
 
 import { UserInterface } from './user.interface'
 import { RconService } from '../rcon/rcon.service'
@@ -25,16 +25,12 @@ export class WhitelistService {
     if (this.isAuthorized(message)) {
       this.message = message
 
-      const [, discord, username] = this.message.content.split(' ')
-
       this.user = {
-        discord,
-        username,
+        username: this.message.content.replace(WhitelistService.COMMAND, ''),
         password: this.generatePassword(),
-        whitelisted: false,
       }
 
-      this.message.react('🧟')
+      message.react('🧟')
 
       this.rcon.request(
         `adduser "${this.user.username}" "${this.user.password}"`,
