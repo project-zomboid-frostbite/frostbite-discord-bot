@@ -7,6 +7,7 @@ import { PlayersService } from './players/players.service'
 import { RconService } from './rcon/rcon.service'
 import { DiscordService } from './discord/discord.service'
 import { RestartWarningService } from './restart-warning/restart-warning.service'
+import { WhitelistService } from './whitelist/whitelist.service'
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { RestartWarningService } from './restart-warning/restart-warning.service
     RconService,
     DiscordService,
     RestartWarningService,
+    WhitelistService,
   ],
 })
 export class AppModule {}

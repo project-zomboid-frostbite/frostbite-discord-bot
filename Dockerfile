@@ -10,4 +10,4 @@ COPY ./src ./src
 RUN npm ci
 RUN npm run build
 
-CMD ["npm", "run", "start:prod"]
+CMD ["NO_COLOR=1", "npm", "run", "start:prod"]

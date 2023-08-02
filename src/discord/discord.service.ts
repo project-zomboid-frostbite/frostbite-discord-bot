@@ -7,7 +7,12 @@ export class DiscordService {
   private readonly logger = new Logger(DiscordService.name)
 
   private client: Client = new Client({
-    intents: [GatewayIntentBits.Guilds],
+    intents: [
+      GatewayIntentBits.Guilds,
+      GatewayIntentBits.GuildMembers,
+      GatewayIntentBits.GuildMessages,
+      GatewayIntentBits.MessageContent,
+    ],
   })
 
   private ready = false
@@ -17,6 +22,16 @@ export class DiscordService {
       this.logger.log('Connected to discord bot')
       this.eventEmitter.emit('discord.ready')
       this.ready = true
+
+      this.bindEvents(['messageCreate'])
+    })
+  }
+
+  bindEvents(events: string[]) {
+    events.forEach((event) => {
+      this.client.on(event, (...args) => {
+        this.eventEmitter.emit(`discord.${event}`, ...args)
+      })
     })
   }
 
